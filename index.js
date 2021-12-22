@@ -5,6 +5,8 @@ const artist = document.getElementById("artist");
 const prev = document.getElementById("prev");
 const next = document.getElementById("next");
 const play = document.getElementById("play");
+const progressContainer = document.getElementById("progress-container");
+const progress = document.getElementById("progress");
 
 const songs = [
   {
@@ -40,9 +42,9 @@ const pauseMusic = () => {
   music.pause();
 };
 
-play.addEventListener("click", () => {
+const playStatus = () => {
   isPlaying ? pauseMusic() : playMusic();
-});
+};
 
 const loadSong = (song) => {
   title.textContent = song.title;
@@ -54,18 +56,32 @@ const loadSong = (song) => {
 let current = 0;
 
 const prevSong = () => {
-  if (current === 0) return;
   current -= 1;
+  if (current < 0) {
+    current = 2;
+  }
   loadSong(songs[current]);
   playMusic();
 };
 const nextSong = () => {
-  if (current === 2) return;
-
   current += 1;
+  if (current > 2) {
+    current = 0;
+  }
+
   loadSong(songs[current]);
   playMusic();
 };
 
+const updateProgress = (e) => {
+  if (isPlaying) {
+    const { duration, currentTime } = e.srcElement;
+    let progressPercent = (currentTime / duration) * 100;
+    progress.style.width = `${progressPercent}%`;
+  }
+};
+
+play.addEventListener("click", playStatus);
 prev.addEventListener("click", prevSong);
 next.addEventListener("click", nextSong);
+music.addEventListener("timeupdate", updateProgress);
